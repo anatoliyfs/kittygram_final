@@ -154,6 +154,11 @@ jobs:
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           source: "docker-compose.production.yml"
           target: "kittygram"
+        
+      - name: Create .env file
+        run: |
+          echo "${{ secrets.KITTYGRAM_ENV }}" > kittygram/.env
+
       - name: Executing remote ssh commands to deploy
         uses: appleboy/ssh-action@master
         with:
