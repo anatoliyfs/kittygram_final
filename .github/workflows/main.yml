@@ -200,7 +200,7 @@ jobs:
 
           • **Статус**: ${{ job.status }}
           • **Репозиторий**: ${{ github.repository }}
-          • **Ветка**: `${{ github.ref_name }}` (${{ github.sha::7 }})
+          • **Ветка**: `${GITHUB_REF_NAME}` (`$(echo $GITHUB_SHA | cut -c1-7)`)
           • **Коммит**: ${{ github.event.commit[0].message }}
           • **Время**: ${{ steps.set-time.outputs.current-time }}
           • **Workflow**: [#${{ github.run_number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
