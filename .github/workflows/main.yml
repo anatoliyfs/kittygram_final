@@ -179,6 +179,7 @@ jobs:
           ${{ job.status == 'success' && 'Всё прошло успешно!' || 'Произошла ошибка!' }}
 
           _Запущено автоматически через GitHub Actions_
+        parse_mode: markdown
 
     - name: Set current time
       id: set-time
