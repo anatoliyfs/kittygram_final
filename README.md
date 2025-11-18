@@ -3,13 +3,13 @@
 
 ![GitHub Workflow Status](https://github.com/anatoliyfs/kittygram_final/actions/workflows/main.yml/badge.svg)
 
-
 ## Описание проекта
 
 **Kittygram** — это backend‑часть веб‑приложения для обмена фотографиями кошек. Проект позволяет пользователям:
 - загружать фотографии своих питомцев;
 - просматривать галерею изображений других пользователей;
 - взаимодействовать с контентом через API.
+
 
 **Цель проекта** — демонстрация работы REST‑API на Django с аутентификацией, обработкой медиафайлов и интеграцией с PostgreSQL.
 
@@ -34,53 +34,87 @@
 - **CI/CD**: GitHub Actions;
 - **Версионирование**: Git.
 
+- **Контейнеризация**: Docker, Docker Compose.
 
-## Как развернуть проект
+## Как развернуть проект в контейнерах
 
-### 1. Клонирование репозитория
+
+### 1. Предварительные требования
+
+Убедитесь, что у вас установлены:
+- [Docker](https://www.docker.com/products/docker-desktop);
+- [Docker Compose](https://docs.docker.com/compose/install/).
+
+### 2. Клонирование репозитория
+
 ```bash
 git clone https://github.com/Port-tf/kittygram-backend.git
 cd kittygram-backend
 ```
 
-### 2. Создание виртуального окружения
+### 3. Подготовка окружения
+
+1. Создайте файл `.env` в корне проекта (см. раздел «Настройка файла `.env`»).
+2. Убедитесь, что все необходимые файлы (включая `docker-compose.yml`) присутствуют в проекте.
+
+
+### 4. Сборка и запуск контейнеров
+
+Выполните команду:
+
 ```bash
-python -m venv venv
-source venv/bin/activate  # Linux/macOS
-venv\Scripts\activate     # Windows
+docker-compose up -d
 ```
 
-### 3. Установка зависимостей
+Эта команда:
+- скачает необходимые образы;
+- создаст и запустит контейнеры;
+- настроит сеть между сервисами.
+
+### 5. Выполнение миграций
+
+После запуска контейнеров выполните миграции базы данных:
+
 ```bash
-pip install -r requirements.txt
-```
-
-### 4. Настройка переменных окружения
-Создайте файл `.env` в корне проекта (пример ниже).
-
-
-### 5. Миграция базы данных
-```bash
-python manage.py migrate
+docker-compose exec backend python manage.py migrate
 ```
 
 ### 6. Сбор статических файлов
+
+Соберите статические файлы:
+
 ```bash
-python manage.py collectstatic
+docker-compose exec backend python manage.py collectstatic --noinput
 ```
 
-### 7. Запуск сервера
+### 7. Создание суперпользователя (опционально)
+
+Для доступа к админ‑панели создайте суперпользователя:
+
 ```bash
-python manage.py runserver
+docker-compose exec backend python manage.py createsuperuser
 ```
-Или через Gunicorn (для продакшена):
+
+### 8. Проверка работы
+
+Откройте в браузере:
+- API: `http://localhost:8000/api/`;
+- Админ‑панель: `http://localhost:8000/admin/`.
+
+
+### 9. Остановка контейнеров
+
+Чтобы остановить контейнеры, выполните:
+
 ```bash
-gunicorn kittygram_backend.wsgi:application
+docker-compose down
 ```
 
 ## Настройка файла `.env`
 
+
 Создайте файл `.env` в корне проекта и заполните по шаблону:
+
 
 ```env
 # Обязательные параметры
@@ -93,7 +127,7 @@ ALLOWED_HOSTS=localhost,127.0.0.1,ваш-домен.ru
 POSTGRES_DB=kittygram
 POSTGRES_USER=kittygram_user
 POSTGRES_PASSWORD=надёжный_пароль
-DB_HOST=localhost
+DB_HOST=db
 DB_NAME=kittygram
 DB_PORT=5432
 
@@ -102,12 +136,40 @@ DB_PORT=5432
 USE_SQLITE=true  # Установите true для SQLite
 ```
 
-**Как получить `SECRET_KEY`:**  
+**Как получить `SECRET_KEY`:**
+
 ```bash
 python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'
 ```
 
+## Структура Docker-конфигурации
+
+- `docker-compose.yml` — основной файл конфигурации контейнеров;
+- `Dockerfile` (в папке `backend/`) — инструкция для сборки образа backend;
+- `.env` — переменные окружения для контейнеров.
+
+
+## Полезные команды Docker Compose
+
+- Посмотреть статус контейнеров:
+  ```bash
+  docker-compose ps
+  ```
+- Просмотреть логи:
+  ```bash
+  docker-compose logs
+  ```
+- Пересобрать образы:
+  ```bash
+  docker-compose build
+  ```
+- Остановить и удалить контейнеры, сети, объёмы:
+  ```bash
+  docker-compose down -v
+  ```
+
 ## Автор
+
 
 **Anatoliyfs**  
 - GitHub: [github.com/Port-tf](https://github.com/anatoliyfs)  
